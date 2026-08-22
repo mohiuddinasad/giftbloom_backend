@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique(); // used for both SEO url AND route binding
             $table->text('description')->nullable();
-            $table->string('image')->nullable();
+            $table->string('image')->nullable(); // relative path inside /public, e.g. uploads/categories/xxx.jpg
 
             // SEO fields
             $table->string('meta_title')->nullable();

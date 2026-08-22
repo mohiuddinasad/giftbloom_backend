@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('product_color_id')
                 ->constrained('product_colors')->cascadeOnDelete();
 
-            $table->string('image_path');
+            $table->string('image_path'); // relative path inside /public, e.g. uploads/products/12/xxx.jpg
             $table->boolean('is_primary')->default(false);
             $table->integer('sort_order')->default(0);
 

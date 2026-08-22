@@ -6,14 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backend\Products\StoreCategoryRequest;
 use App\Http\Requests\Backend\Products\UpdateCategoryRequest;
 use App\Models\Backend\Products\Category;
-use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        // top-level categories with their sub-categories eager loaded,
-        // plus a product count for a quick glance in the list view
         $categories = Category::with('children')
             ->withCount('products')
             ->parents()
@@ -25,7 +23,6 @@ class CategoryController extends Controller
 
     public function create()
     {
-        // only top-level categories can be picked as a parent
         $parentCategories = Category::parents()->orderBy('name')->get();
 
         return view('backend.products.categories.create', compact('parentCategories'));
@@ -36,7 +33,7 @@ class CategoryController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('categories', 'public');
+            $data['image'] = $this->uploadImage($request->file('image'), 'uploads/categories');
         }
 
         $data['status'] = $request->boolean('status', true);
@@ -48,7 +45,7 @@ class CategoryController extends Controller
             ->with('success', "Category \"{$category->name}\" created.");
     }
 
-    // $category is resolved by SLUG now (Category::getRouteKeyName() == 'slug')
+    // $category resolved by slug
     public function edit(Category $category)
     {
         $parentCategories = Category::parents()
@@ -64,10 +61,8 @@ class CategoryController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            if ($category->image) {
-                Storage::disk('public')->delete($category->image);
-            }
-            $data['image'] = $request->file('image')->store('categories', 'public');
+            $this->deletePublicFile($category->image);
+            $data['image'] = $this->uploadImage($request->file('image'), 'uploads/categories');
         }
 
         $data['status'] = $request->boolean('status', true);
@@ -79,22 +74,40 @@ class CategoryController extends Controller
             ->with('success', "Category \"{$category->name}\" updated.");
     }
 
+    // deleting ANY category (top-level or sub-category) is allowed;
+    // it cascades to its sub-categories and every product under them
     public function destroy(Category $category)
     {
-        if ($category->children()->exists()) {
-            return back()->with('error', 'Delete or move the sub-categories first.');
+        $name = $category->name;
+
+        $category->deleteWithChildrenAndProducts();
+
+        return redirect()
+            ->route('dashboard.categories.index')
+            ->with('success', "Category \"{$name}\" and everything under it was deleted.");
+    }
+
+    /**
+     * Move an uploaded file into /public/{$folder} with a random unique
+     * name and return the path relative to /public (stored in the DB).
+     */
+    private function uploadImage(UploadedFile $file, string $folder): string
+    {
+        $filename = uniqid().'_'.time().'.'.$file->getClientOriginalExtension();
+        $file->move(public_path($folder), $filename);
+
+        return $folder.'/'.$filename;
+    }
+
+    private function deletePublicFile(?string $relativePath): void
+    {
+        if (! $relativePath) {
+            return;
         }
 
-        if ($category->products()->exists()) {
-            return back()->with('error', 'This category still has products. Move or delete them first.');
+        $path = public_path($relativePath);
+        if (file_exists($path)) {
+            @unlink($path);
         }
-
-        if ($category->image) {
-            Storage::disk('public')->delete($category->image);
-        }
-
-        $category->delete();
-
-        return back()->with('success', 'Category deleted.');
     }
 }

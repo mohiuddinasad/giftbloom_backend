@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./asset/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./asset/css/style.css">
+    <link rel="stylesheet" href="./asset/css/responsive.css">
+    <link rel="stylesheet" href="./asset/css/slick.min.css">
+
+    <title>GiftBloom | Checkout</title>
+
+</head>
+
+<body>
+    <header>
+
+        <!-- navbar -->
+        <nav class="navbar navbar-expand-lg">
+            <div class="container d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+
+                    <button style="border: none; outline: none;" class="navbar-toggler " type="button"
+                        data-bs-toggle="offcanvas" href="#offcanvasExample" role="button"
+                        aria-controls="offcanvasExample">
+                        <iconify-icon icon="fa6-solid:bars" width="18" height="18"></iconify-icon>
+                    </button>
+                    <a href="" class="search d-lg-none mx-3" type="button" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">
+                        <iconify-icon icon="iconamoon:search-light" width="18" height="18"></iconify-icon>
+                    </a>
+                </div>
+                <a class="navbar-brand logo m-0" href="index.html"><img
+                        style="width: 100px; height: auto; object-fit: contain;" src="./asset/image/logo.jpg"
+                        alt=""></a>
+
+                <div class="cart_profile d-lg-none d-flex align-items-center">
+                    <a href="" class="user mx-2">
+                        <iconify-icon icon="qlementine-icons:user-16" width="24" height="24"></iconify-icon>
+                    </a>
+                    <a href="" class="cart mx-2" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                        <iconify-icon icon="bi:bag" width="24" height="24"></iconify-icon>
+                    </a>
+                </div>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="products.html">All Gifts Items</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="products.html">Gift Packages</a>
+                        </li>
+
+                    </ul>
+
+                    <a href="" class="search mx-2 " type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <iconify-icon icon="iconamoon:search-light" width="24" height="24"></iconify-icon>
+                    </a>
+                    <a href="" class="user mx-2">
+                        <iconify-icon icon="qlementine-icons:user-16" width="24" height="24"></iconify-icon>
+                    </a>
+                    <a href="" class="cart mx-2" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                        <iconify-icon icon="bi:bag" width="24" height="24"></iconify-icon>
+                    </a>
+
+                </div>
+            </div>
+        </nav>
+
+        <!----------------------- modal ----------------------->
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+
+                    <div class="search-input-wrap">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="7"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="Search" autocomplete="off">
+                        <button type="button" class="btn-close-search" data-bs-dismiss="modal" aria-label="Close">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round">
+                                <line x1="4" y1="4" x2="20" y2="20"></line>
+                                <line x1="20" y1="4" x2="4" y2="20"></line>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="modal-body-inner">
+                        <div>
+                            <div class="section-title-row">
+                                <h6>products</h6>
+                            </div>
+                            <div class="row" id="recentlyViewedList">
+                                <div class="col-6 col-md-3 thumb-card">
+                                    <img src="https://prezentobd.com/cdn/shop/files/wmremove-transformed_2.webp?v=1775998025&width=832"
+                                        alt="Red Velvet">
+                                    <div class="p-name">Red Velvet</div>
+                                    <div class="p-price">Tk 3,800.00</div>
+                                </div>
+                                <div class="col-6 col-md-3 thumb-card">
+                                    <img src="https://prezentobd.com/cdn/shop/files/wmremove-transformed_1.webp?v=1775997020&width=832"
+                                        alt="Humba box">
+                                    <div class="p-name">Humba box</div>
+                                    <div class="p-price">Tk 2,930.00</div>
+                                </div>
+                                <div class="col-6 col-md-3 thumb-card">
+                                    <img src="https://prezentobd.com/cdn/shop/files/Gemini_Generated_Image_549j86549j86549j-ezremove.webp?v=1778927168&width=832"
+                                        alt="Humba box">
+                                    <div class="p-name">Humba box</div>
+                                    <div class="p-price">Tk 2,930.00</div>
+                                </div>
+                                <div class="col-6 col-md-3 thumb-card">
+                                    <img src="https://prezentobd.com/cdn/shop/files/wmremove-transformed_3.webp?v=1775999025&width=832"
+                                        alt="Humba box">
+                                    <div class="p-name">Humba box</div>
+                                    <div class="p-price">Tk 2,930.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!---------------- navbar offcanvas ---------------->
+
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample"
+            aria-labelledby="offcanvasExampleLabel">
+            <div class="offcanvas-header">
+                <a href="">
+                    <img style="width: 150px;
+      height: auto;" src="https://prezentobd.com/cdn/shop/files/Prezento_Logo.png?height=72&v=1759096679" alt="">
+                </a>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="products.html">All Gifts Items</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="products.html">Gift Packages</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- cetagories -->
+        <section id="cetagory">
+            <div class="container">
+                <div class="mobile-cetagory-trigger" onclick="toggleCategory()">
+                    <i class="fa-solid fa-bars"></i>
+                    <span>Gift Categories</span>
+                    <i class="fa-solid fa-chevron-down category-chevron"></i>
+                </div>
+                <div class="d-flex flex-wrap justify-content-center cetagory-list" id="categoryList">
+                    <div class="cetagory-item"><a href="products.html">Birthday Gifts</a></div>
+                    <div class="cetagory-item"><a href="products.html">Sorry Gifts</a></div>
+                    <div class="cetagory-item"><a href="products.html">Anniversary Gifts</a></div>
+                    <div class="cetagory-item"><a href="products.html">Valentine's Day</a></div>
+                    <div class="cetagory-item"><a href="products.html">Women's Day</a></div>
+                    <div class="cetagory-item"><a href="products.html">Mother's Day</a></div>
+                    <div class="cetagory-item"><a href="products.html">Gift Wrapping</a></div>
+                </div>
+            </div>
+        </section>
+
+        <!---------------------- cart offcanvas ---------------------->
+
+        <div class="cart_offcanvas offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight"
+            aria-labelledby="offcanvasRightLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasRightLabel">
+                    Cart <span class="cart-count" id="cartCount">2</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-body">
+                <div id="cartItemsList">
+                    <div class="cart-item" data-price="1390">
+                        <img class="cart-item__img"
+                            src="https://images.unsplash.com/photo-1520763185298-1b434c919102?w=200&h=200&fit=crop"
+                            alt="The Ruby Essence">
+                        <div class="cart-item__info">
+                            <div class="cart-item__top">
+                                <div>
+                                    <p class="cart-item__name">The Ruby Essence</p>
+                                    <p class="cart-item__unit-price">Tk 1,390.00</p>
+                                </div>
+                                <div class="cart-item__line-total">Tk 1,390.00</div>
+                            </div>
+                            <div class="cart-item__controls">
+                                <div class="qty-stepper">
+                                    <button type="button" class="qty-minus"
+                                        aria-label="Decrease quantity">&minus;</button>
+                                    <input type="text" class="qty-input" value="1" readonly>
+                                    <button type="button" class="qty-plus" aria-label="Increase quantity">+</button>
+                                </div>
+                                <button type="button" class="cart-item__remove" aria-label="Remove item">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cart-item" data-price="2230">
+                        <img class="cart-item__img"
+                            src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=200&h=200&fit=crop"
+                            alt="Pink Me Up">
+                        <div class="cart-item__info">
+                            <div class="cart-item__top">
+                                <div>
+                                    <p class="cart-item__name">Pink Me Up</p>
+                                    <p class="cart-item__unit-price">Tk 2,230.00</p>
+                                </div>
+                                <div class="cart-item__line-total">Tk 2,230.00</div>
+                            </div>
+                            <div class="cart-item__controls">
+                                <div class="qty-stepper">
+                                    <button type="button" class="qty-minus"
+                                        aria-label="Decrease quantity">&minus;</button>
+                                    <input type="text" class="qty-input" value="1" readonly>
+                                    <button type="button" class="qty-plus" aria-label="Increase quantity">+</button>
+                                </div>
+                                <button type="button" class="cart-item__remove" aria-label="Remove item">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cart-note" id="cartNote">
+                    <button type="button" class="cart-note__toggle" id="noteToggleBtn">
+                        Special instructions
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                    <textarea placeholder="Add any special instructions..."></textarea>
+                </div>
+
+                <div class="cart-summary">
+                    <div class="cart-summary__row">
+                        <span>Estimated total</span>
+                        <span id="cartTotal">Tk 3,620.00 BDT</span>
+                    </div>
+                    <p class="cart-summary__note">Taxes, discounts and shipping calculated at checkout.</p>
+
+                    <a href="checkout.html" class="cart-checkout-btn">Checkout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!---------------------- checkout page content ---------------------->
+
+    <main class="checkout-page">
+        <div class="container">
+
+            <h1 class="checkout-title">Checkout</h1>
+
+            <div class="row">
+
+                <!-- LEFT: forms -->
+                <div class="col-lg-7">
+
+                    <!-- Step 1: Delivery details -->
+                    <div class="co-card">
+                        <div class="co-card__step">
+                            <span class="num">1</span>
+                            <h2>Delivery Details</h2>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="co-field">
+                                    <label for="fullName">Full Name</label>
+                                    <input type="text" id="fullName" placeholder="e.g. Mohiuddin Asad">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="co-field">
+                                    <label for="phone">Phone Number</label>
+                                    <input type="tel" id="phone" placeholder="01XXX-XXXXXX">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="co-field">
+                            <label for="address">Full Address</label>
+                            <input type="text" id="address" placeholder="House, Road, Area">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="co-field">
+                                    <label for="area">Area / Thana</label>
+                                    <input type="text" id="area" placeholder="e.g. Pahartali">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="co-field">
+                                    <label for="city">City</label>
+                                    <input type="text" id="city" placeholder="e.g. Chattogram" value="Chattogram">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="co-field">
+                            <label for="note">Order Note (optional)</label>
+                            <textarea id="note" placeholder="Any delivery instructions..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Shipping method -->
+                    <div class="co-card">
+                        <div class="co-card__step">
+                            <span class="num">2</span>
+                            <h2>Shipping Method</h2>
+                        </div>
+
+                        <label class="ship-option active">
+                            <input type="radio" name="shipping" checked>
+                            <span class="ship-option__icon"><i class="fa-solid fa-location-dot"></i></span>
+                            <span class="ship-option__text">
+                                <span class="t">Inside Chattogram</span>
+                            </span>
+                            <span class="ship-option__price">Tk 70.00</span>
+                        </label>
+
+                        <label class="ship-option">
+                            <input type="radio" name="shipping">
+                            <span class="ship-option__icon"><i class="fa-solid fa-route"></i></span>
+                            <span class="ship-option__text">
+                                <span class="t">Near Chattogram</span>
+                            </span>
+                            <span class="ship-option__price">Tk 120.00</span>
+                        </label>
+
+                        <label class="ship-option">
+                            <input type="radio" name="shipping">
+                            <span class="ship-option__icon"><i class="fa-solid fa-truck-fast"></i></span>
+                            <span class="ship-option__text">
+                                <span class="t">Outside Chattogram</span>
+                            </span>
+                            <span class="ship-option__price">Tk 150.00</span>
+                        </label>
+                    </div>
+
+                    <!-- Step 3: Payment method -->
+                    <div class="co-card">
+                        <div class="co-card__step">
+                            <span class="num">3</span>
+                            <h2>Payment Method</h2>
+                        </div>
+
+                        <div class="pay-option">
+                            <span class="pay-option__icon"><i class="fa-solid fa-money-bill-wave"></i></span>
+                            <div>
+                                <div class="t">Cash on Delivery (COD)</div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- RIGHT: order summary -->
+                <div class="col-lg-5 mt-4 mt-lg-0">
+                    <div class="co-summary">
+                        <h2>Order Summary</h2>
+
+                        <div class="co-summary-item">
+                            <img src="https://images.unsplash.com/photo-1520763185298-1b434c919102?w=200&h=200&fit=crop"
+                                alt="The Ruby Essence">
+                            <div class="co-summary-item__info">
+                                <div class="n">The Ruby Essence</div>
+                                <div class="q">Qty: 1</div>
+                            </div>
+                            <div class="co-summary-item__price">Tk 1,390.00</div>
+                        </div>
+
+                        <div class="co-summary-item">
+                            <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=200&h=200&fit=crop"
+                                alt="Pink Me Up">
+                            <div class="co-summary-item__info">
+                                <div class="n">Pink Me Up</div>
+                                <div class="q">Qty: 1</div>
+                            </div>
+                            <div class="co-summary-item__price">Tk 2,230.00</div>
+                        </div>
+
+                        
+
+                        <div class="co-totals">
+                            <div class="co-totals-row">
+                                <span>Subtotal</span>
+                                <span>Tk 3,620.00</span>
+                            </div>
+                            <div class="co-totals-row">
+                                <span>Shipping</span>
+                                <span id="shipCost">Tk 70.00</span>
+                            </div>
+                            <div class="co-totals-row grand">
+                                <span>Total</span>
+                                <span id="grandTotal">Tk 3,690.00 BDT</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="co-place-btn">Place Order</button>
+
+                        <div class="co-secure">
+                            <i class="fa-solid fa-lock"></i> Your information is safe with us
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!---------------------- footer  ---------------------->
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row gy-4">
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="footer-logo mb-3">Giftbloom<span>BD</span></div>
+                    <p class="footer-desc">
+                        Premium gift hampers, carefully selected for your loved ones — make every moment even more
+                        memorable.
+                    </p>
+                    <div class="social-icons mt-4">
+                        <a href="#"><iconify-icon icon="ic:baseline-facebook" width="24" height="24"></iconify-icon></a>
+                        <a href="#"><iconify-icon icon="mdi:instagram" width="24" height="24"></iconify-icon></a>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="footer-heading">Quick Links</div>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">All Items</a></li>
+                        <li><a href="#">Gift Packages</a></li>
+                        <li><a href="#">Gift Wrapping</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-md-3 col-lg-2">
+                    <div class="footer-heading">Information</div>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Shipping & Return Policy</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-12 col-lg-4">
+                    <div class="footer-heading">Contact Us</div>
+                    <div class="contact-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Chattogram, Bangladesh</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-telephone-fill"></i>
+                        <span>+8801838-554691</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>giftbloombd@gmail.com</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div
+                class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 text-center text-md-start">
+                <span>&copy; 2026 PrezentBD. All rights reserved.</span>
+                <div class="d-flex gap-3">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./asset/js/script.js"></script>
+    <script src="./asset/js/vedio.js"></script>
+    <script src="./asset/js/addToCart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="./asset/js/jquery-3.7.1.min.js"></script>
+    <script src="./asset/js/slick.min.js"></script>
+    <script src="./asset/js/banner.js"></script>
+    <script src="./asset/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+
+    <script>
+        // shipping selection + live total
+        const shipOptions = document.querySelectorAll('.ship-option');
+        const shipPrices = [70, 120, 150];
+        const subtotal = 3620;
+        const shipCostEl = document.getElementById('shipCost');
+        const grandTotalEl = document.getElementById('grandTotal');
+
+        shipOptions.forEach((opt, i) => {
+            opt.addEventListener('click', () => {
+                shipOptions.forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                opt.querySelector('input[type="radio"]').checked = true;
+
+                const cost = shipPrices[i];
+                shipCostEl.textContent = 'Tk ' + cost.toFixed(2);
+                grandTotalEl.textContent = 'Tk ' + (subtotal + cost).toLocaleString() + '.00 BDT';
+            });
+        });
+    </script>
+
+</body>
+
+</html>

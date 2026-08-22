@@ -2,10 +2,8 @@
 
 namespace App\Models\Backend\Products;
 
-use App\Models\Backend\Products\Product;
-use App\Models\Backend\Products\ProductImage;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductColor extends Model
 {
@@ -20,7 +18,6 @@ class ProductColor extends Model
         return $this->belongsTo(Product::class);
     }
 
-    // images that belong to this specific color (e.g. Red -> red shirt photos)
     public function images()
     {
         return $this->hasMany(ProductImage::class);
@@ -31,4 +28,3 @@ class ProductColor extends Model
         return $this->hasOne(ProductImage::class)->where('is_primary', true);
     }
 }
-

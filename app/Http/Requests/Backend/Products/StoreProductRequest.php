@@ -31,20 +31,12 @@ class StoreProductRequest extends FormRequest
             'status' => ['nullable', 'boolean'],
             'is_featured' => ['nullable', 'boolean'],
 
-            // 2. colour-wise images: colors[0][name], colors[0][code], colors[0][images][]
-            'colors' => ['required', 'array', 'min:1'],
-            'colors.*.color_name' => ['required', 'string', 'max:100'],
+            // colors are entirely optional now - a product doesn't have to have any
+            'colors' => ['nullable', 'array'],
+            'colors.*.color_name' => ['nullable', 'string', 'max:100'],
             'colors.*.color_code' => ['nullable', 'string', 'max:20'],
-            'colors.*.images' => ['required', 'array', 'min:1'],
+            'colors.*.images' => ['nullable', 'array'],
             'colors.*.images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'colors.required' => 'Add at least one color for this product.',
-            'colors.*.images.required' => 'Upload at least one image for each color.',
         ];
     }
 }

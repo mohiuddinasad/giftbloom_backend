@@ -2,9 +2,8 @@
 
 namespace App\Models\Backend\Products;
 
-use App\Models\Backend\Products\ProductColor;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductImage extends Model
 {
@@ -23,8 +22,9 @@ class ProductImage extends Model
         return $this->belongsTo(ProductColor::class, 'product_color_id');
     }
 
+    // image_path stores a path relative to /public (e.g. "uploads/products/12/xxx.jpg")
     public function getUrlAttribute(): string
     {
-        return asset('storage/'.$this->image_path);
+        return asset($this->image_path);
     }
 }

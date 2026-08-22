@@ -14,15 +14,13 @@ class UpdateCategoryRequest extends FormRequest
 
     public function rules(): array
     {
-        // route('category') resolves to the bound Category model (looked
-        // up by slug now, not id) - ->id still gives its numeric primary key
         $categoryId = $this->route('category')->id;
 
         return [
             'parent_id' => [
                 'nullable',
                 'exists:categories,id',
-                Rule::notIn([$categoryId]), // can't be its own parent
+                Rule::notIn([$categoryId]),
             ],
             'name' => ['required', 'string', 'max:191'],
             'description' => ['nullable', 'string'],

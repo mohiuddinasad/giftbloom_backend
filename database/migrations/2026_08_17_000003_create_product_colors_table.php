@@ -14,8 +14,10 @@ return new class extends Migration
             $table->foreignId('product_id')
                 ->constrained('products')->cascadeOnDelete();
 
-            $table->string('color_name');      // e.g. Red
-            $table->string('color_code', 20)->nullable(); // e.g. #ff0000
+            // nullable: many products on this site won't have colors at all,
+            // this row can just act as a plain image group when color_name is empty
+            $table->string('color_name')->nullable();
+            $table->string('color_code', 20)->nullable();
             $table->integer('qty')->default(0); // optional: per-color stock
             $table->integer('sort_order')->default(0);
 

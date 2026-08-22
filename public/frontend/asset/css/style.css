@@ -48,14 +48,29 @@ a {
 /* nav bar */
 
 .navbar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  background: #fff;
-  z-index: 888;
-  padding: 0;
-  /* border-bottom: 1px solid; */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #fff;
+    z-index: 888;
+    padding: 0;
+    /* border-bottom: 1px solid; */
+}
+.navbar .cart {
+    position: relative;
+}
+.navbar .cart .cart_badge{
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: var(--color-cta);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    top: -6px;
+    right: -9px;
 }
 
 .navbar .logo img {
@@ -180,6 +195,7 @@ a {
   display: flex;
   align-items: center;
   gap: 14px;
+  justify-content: space-between;
   margin-top: 10px;
 }
 
@@ -440,7 +456,7 @@ a {
 
 #cetagory {
   margin-top: 69px;
-  padding: 20px 0;
+  padding: 15px 0;
   background-color: var(--color-bg-soft);
 }
 
@@ -1844,4 +1860,103 @@ footer.site-footer a:hover {
   font-size: 11.5px;
   color: var(--color-text-light);
   margin-top: 12px;
+}
+.custom-pagination {
+    font-family: var(--primary-font);
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.pagination-list {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.page-item {
+    display: flex;
+}
+
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 10px;
+    background-color: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.page-link:hover {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary-dark);
+    color: var(--color-text-on-dark);
+}
+
+/* Active page */
+.page-item.active .page-link {
+    background-color: var(--color-cta);
+    border-color: var(--color-cta);
+    color: var(--color-text-on-dark);
+    box-shadow: 0 4px 10px rgba(200, 107, 74, 0.35);
+}
+
+/* Disabled (prev/next যখন disable থাকবে) */
+.page-item.disabled .page-link {
+    background-color: var(--color-bg-soft);
+    border-color: var(--color-border);
+    color: var(--color-text-light);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.page-item.disabled .page-link:hover {
+    background-color: var(--color-bg-soft);
+    color: var(--color-text-light);
+}
+
+/* Arrow buttons (Prev / Next) */
+.page-link-arrow {
+    color: var(--color-primary);
+}
+
+.page-item:not(.disabled) .page-link-arrow:hover {
+    background-color: var(--color-cta);
+    border-color: var(--color-cta);
+    color: var(--color-text-on-dark);
+}
+
+/* Dots (...) */
+.page-link-dots {
+    background: transparent;
+    border: none;
+    color: var(--color-text-light);
+    cursor: default;
+}
+
+.page-link-dots:hover {
+    background: transparent !important;
+    color: var(--color-text-light) !important;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .page-link {
+        min-width: 34px;
+        height: 34px;
+        padding: 0 8px;
+        font-size: 13px;
+    }
 }

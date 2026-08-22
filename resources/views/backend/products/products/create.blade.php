@@ -1,138 +1,164 @@
 @extends('backend.layout')
-
 @section('backend_title', 'Add Product')
-
-
-
 @section('backend_content')
-<div class="container-fluid">
-    <h4 class="mb-3">Add Product</h4>
+@include('backend.products._styles')
+
+<div class="cp-wrap">
+    <div class="cp-header">
+        <div>
+            <div class="cp-breadcrumb">
+                <a href="{{ route('dashboard') }}">Dashboard</a> /
+                <a href="{{ route('dashboard.products.index') }}">Products</a> / Add
+            </div>
+            <h1>Add Product</h1>
+        </div>
+    </div>
 
     @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
-            </ul>
+        <div class="cp-alert cp-alert-danger">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <ul>@foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach</ul>
         </div>
     @endif
 
     <form action="{{ route('dashboard.products.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
         @csrf
 
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Product Name</label>
-                <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
-            </div>
-
-            <div class="col-md-6">
-                {{-- 1. category (with sub-categories shown indented) --}}
-                <label class="form-label">Category</label>
-                <select name="category_id" class="form-select" required>
-                    <option value="">-- Select --</option>
-                    @foreach ($categories as $cat)
-                        @if (! $cat->parent_id)
-                            <option value="{{ $cat->id }}" @selected(old('category_id') == $cat->id)>{{ $cat->name }}</option>
-                            @foreach ($cat->children as $child)
-                                <option value="{{ $child->id }}" @selected(old('category_id') == $child->id)>&nbsp;&nbsp;— {{ $child->name }}</option>
+        {{-- basic info --}}
+        <div class="cp-card">
+            <div class="cp-card-header"><h2><i class="bi bi-box-seam"></i> Basic Information</h2></div>
+            <div class="cp-card-body">
+                <div class="cp-grid cp-grid-2">
+                    <div>
+                        <label class="cp-label">Product Name</label>
+                        <input type="text" name="name" class="cp-input" value="{{ old('name') }}" required>
+                    </div>
+                    <div>
+                        <label class="cp-label">Category</label>
+                        <select name="category_id" class="cp-select" required>
+                            <option value="">-- Select --</option>
+                            @foreach ($categories as $cat)
+                                @if (! $cat->parent_id)
+                                    <option value="{{ $cat->id }}" @selected(old('category_id') == $cat->id)>{{ $cat->name }}</option>
+                                    @foreach ($cat->children as $child)
+                                        <option value="{{ $child->id }}" @selected(old('category_id') == $child->id)>&nbsp;&nbsp;— {{ $child->name }}</option>
+                                    @endforeach
+                                @endif
                             @endforeach
-                        @endif
-                    @endforeach
-                </select>
-            </div>
+                        </select>
+                    </div>
+                </div>
 
-            <div class="col-md-4">
-                {{-- 3. product type --}}
-                <label class="form-label">Product Type</label>
-                <select name="type" class="form-select" required>
-                    @foreach ($types as $value => $label)
-                        <option value="{{ $value }}" @selected(old('type') == $value)>{{ $label }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                {{-- 4. gift for --}}
-                <label class="form-label">Gift For</label>
-                <select name="gift_for" class="form-select">
-                    <option value="">-- N/A --</option>
-                    @foreach ($giftFor as $value => $label)
-                        <option value="{{ $value }}" @selected(old('gift_for') == $value)>{{ $label }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                {{-- 7. qty --}}
-                <label class="form-label">Opening Quantity</label>
-                <input type="number" name="qty" class="form-control" value="{{ old('qty', 0) }}" min="0" required>
-            </div>
-
-            <div class="col-md-3">
-                {{-- 5. price --}}
-                <label class="form-label">Price</label>
-                <input type="number" step="0.01" name="price" class="form-control" value="{{ old('price') }}" required>
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Discount Price <small class="text-muted">(optional)</small></label>
-                <input type="number" step="0.01" name="discount_price" class="form-control" value="{{ old('discount_price') }}">
-            </div>
-
-            <div class="col-12">
-                <label class="form-label">Short Description</label>
-                <input type="text" name="short_description" class="form-control" maxlength="500" value="{{ old('short_description') }}">
-            </div>
-
-            <div class="col-12">
-                {{-- 6. rich text description, MS-Word-style editing with bullet points --}}
-                <label class="form-label">Description</label>
-                <div id="editor" style="height:220px;background:#fff;">{!! old('description') !!}</div>
-                {{-- hidden input actually submitted to the server --}}
-                <input type="hidden" name="description" id="description-input">
-            </div>
-
-            <div class="col-12"><hr><h6>Colours &amp; Images</h6>
-                <small class="text-muted">Add a colour, then upload the photos that belong to that colour (e.g. Red → red shirt photos).</small>
-            </div>
-
-            {{-- 2. colour-wise images, dynamically repeatable --}}
-            <div class="col-12" id="colorRows"></div>
-
-            <div class="col-12">
-                <button type="button" class="btn btn-outline-secondary btn-sm" id="addColorRow">+ Add Colour</button>
-            </div>
-
-            <div class="col-12"><hr><h6>SEO</h6></div>
-
-            <div class="col-md-4">
-                <label class="form-label">Meta Title</label>
-                <input type="text" name="meta_title" class="form-control" value="{{ old('meta_title') }}">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Meta Keywords</label>
-                <input type="text" name="meta_keywords" class="form-control" value="{{ old('meta_keywords') }}">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Meta Description</label>
-                <input type="text" name="meta_description" class="form-control" value="{{ old('meta_description') }}">
-            </div>
-
-            <div class="col-md-6">
-                <div class="form-check form-switch">
-                    <input type="checkbox" name="status" value="1" class="form-check-input" checked>
-                    <label class="form-check-label">Published</label>
+                <div class="cp-grid cp-grid-3" style="margin-top:1rem">
+                    <div>
+                        <label class="cp-label">Product Type</label>
+                        <select name="type" class="cp-select" required>
+                            @foreach ($types as $value => $label)
+                                <option value="{{ $value }}" @selected(old('type') == $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="cp-label">Gift For <span class="cp-optional">(optional)</span></label>
+                        <select name="gift_for" class="cp-select">
+                            <option value="">-- N/A --</option>
+                            @foreach ($giftFor as $value => $label)
+                                <option value="{{ $value }}" @selected(old('gift_for') == $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="cp-label">Opening Quantity</label>
+                        <input type="number" name="qty" class="cp-input" value="{{ old('qty', 0) }}" min="0" required>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-check form-switch">
-                    <input type="checkbox" name="is_featured" value="1" class="form-check-input">
-                    <label class="form-check-label">Featured</label>
+        </div>
+
+        {{-- pricing --}}
+        <div class="cp-card">
+            <div class="cp-card-header"><h2><i class="bi bi-tag"></i> Pricing</h2></div>
+            <div class="cp-card-body">
+                <div class="cp-grid cp-grid-2">
+                    <div>
+                        <label class="cp-label">Price</label>
+                        <input type="number" step="0.01" name="price" class="cp-input" value="{{ old('price') }}" required>
+                    </div>
+                    <div>
+                        <label class="cp-label">Discount Price <span class="cp-optional">(optional)</span></label>
+                        <input type="number" step="0.01" name="discount_price" class="cp-input" value="{{ old('discount_price') }}">
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-12">
-                <button class="btn btn-primary">Save Product</button>
+        {{-- description --}}
+        <div class="cp-card">
+            <div class="cp-card-header"><h2><i class="bi bi-card-text"></i> Description</h2></div>
+            <div class="cp-card-body">
+                <label class="cp-label">Short Description</label>
+                <input type="text" name="short_description" class="cp-input" maxlength="500" value="{{ old('short_description') }}">
+
+                <div style="margin-top:1rem">
+                    <label class="cp-label">Full Description</label>
+                    <div class="cp-editor-wrap">
+                        <div id="editor" style="height:220px;background:#fff;">{!! old('description') !!}</div>
+                    </div>
+                    <input type="hidden" name="description" id="description-input">
+                </div>
+            </div>
+        </div>
+
+        {{-- colours & images --}}
+        <div class="cp-card">
+            <div class="cp-card-header">
+                <h2> Images</h2>
+                <span class="cp-hint">Only add this if the product comes in multiple colours</span>
+            </div>
+            <div class="cp-card-body">
+                <div id="colorRows"></div>
+                <button type="button" class="cp-btn cp-btn-outline cp-btn-sm" id="addColorRow">
+                    <i class="bi bi-plus-lg"></i> Add Image
+                </button>
+            </div>
+        </div>
+
+        {{-- SEO + publish --}}
+        <div class="cp-card">
+            <div class="cp-card-header"><h2><i class="bi bi-search"></i> SEO</h2></div>
+            <div class="cp-card-body">
+                <div class="cp-grid cp-grid-3">
+                    <div>
+                        <label class="cp-label">Meta Title</label>
+                        <input type="text" name="meta_title" class="cp-input" value="{{ old('meta_title') }}">
+                    </div>
+                    <div>
+                        <label class="cp-label">Meta Keywords</label>
+                        <input type="text" name="meta_keywords" class="cp-input" value="{{ old('meta_keywords') }}">
+                    </div>
+                    <div>
+                        <label class="cp-label">Meta Description</label>
+                        <input type="text" name="meta_description" class="cp-input" value="{{ old('meta_description') }}">
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:2rem; margin-top:1.25rem; flex-wrap:wrap">
+                    <div class="cp-switch">
+                        <input type="checkbox" name="status" id="status" value="1" checked>
+                        <label for="status">Published</label>
+                    </div>
+                    <div class="cp-switch">
+                        <input type="checkbox" name="is_featured" id="is_featured" value="1">
+                        <label for="is_featured">Featured</label>
+                    </div>
+                </div>
+
+                <div class="cp-form-actions">
+                    <a href="{{ route('dashboard.products.index') }}" class="cp-btn cp-btn-outline">Cancel</a>
+                    <button type="submit" class="cp-btn cp-btn-primary">
+                        <i class="bi bi-check2"></i> Save Product
+                    </button>
+                </div>
             </div>
         </div>
     </form>
@@ -142,8 +168,6 @@
 @push('backend_js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
 <script>
-    // 6. Quill toolbar: bold/italic/underline, headings and bullet/numbered
-    // lists — the "point the text" requirement — output is saved as HTML.
     const quill = new Quill('#editor', {
         theme: 'snow',
         modules: {
@@ -161,27 +185,26 @@
         document.getElementById('description-input').value = quill.root.innerHTML;
     });
 
-    // ---- dynamic colour + image rows ----
     let colorIndex = 0;
     const colorRows = document.getElementById('colorRows');
 
     function addColorRow() {
         const i = colorIndex++;
         const row = document.createElement('div');
-        row.className = 'card mb-2';
+        row.className = 'cp-color-row';
         row.innerHTML = `
-            <div class="card-body row g-2 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Colour Name</label>
-                    <input type="text" name="colors[${i}][color_name]" class="form-control" placeholder="e.g. Red" required>
+            <button type="button" class="cp-btn cp-btn-danger cp-btn-icon remove-color" title="Remove">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="d-flex align-items-center gap-3" style="grid-template-columns:2fr 1fr 3fr;">
+                <div>
+                    <label class="cp-label">Colour Name <span class="cp-optional">(optional)</span></label>
+                    <input type="text" name="colors[${i}][color_name]" class="cp-input" placeholder="e.g. Red">
                 </div>
-                
-                <div class="col-md-5">
-                    <label class="form-label">Images for this colour</label>
-                    <input type="file" name="colors[${i}][images][]" class="form-control" accept="image/*" multiple required>
-                </div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-color">Remove</button>
+
+                <div>
+                    <label class="cp-label">Images</label>
+                    <input type="file" name="colors[${i}][images][]" class="cp-input" accept="image/*" multiple>
                 </div>
             </div>`;
         row.querySelector('.remove-color').addEventListener('click', () => row.remove());
@@ -189,6 +212,5 @@
     }
 
     document.getElementById('addColorRow').addEventListener('click', addColorRow);
-    addColorRow(); // start with one colour row
 </script>
 @endpush

@@ -9,10 +9,8 @@ use App\Models\Backend\Products\Category;
 use App\Models\Backend\Products\Product;
 use App\Models\Backend\Products\ProductColor;
 use App\Models\Backend\Products\ProductImage;
-use App\Models\Backend\Products\StockMovement;
-use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile; 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -47,14 +45,9 @@ class ProductController extends Controller
                 'is_featured' => $request->boolean('is_featured'),
             ]);
 
-            $this->syncColorsAndImages($product, $data['colors']);
-
-            // initial stock qty logged as an "in" movement so the audit
-            // trail always explains where the starting number came from
-            if ($product->qty > 0) {
-                StockMovement::record(
-                    $product, 'in', $product->qty, 'Initial stock'
-                );
+            // colors are optional now - only sync if the user actually added any
+            if (! empty($data['colors'])) {
+                $this->syncColorsAndImages($product, $data['colors']);
             }
 
             return $product;
@@ -65,7 +58,7 @@ class ProductController extends Controller
             ->with('success', "Product \"{$product->name}\" created.");
     }
 
-    // $product is resolved by SLUG now (Product::getRouteKeyName() == 'slug')
+    // $product resolved by slug
     public function edit(Product $product)
     {
         $product->load('colors.images');
@@ -84,6 +77,7 @@ class ProductController extends Controller
         $data = $request->validated();
 
         DB::transaction(function () use ($data, $request, $product) {
+            // qty is part of $data now, so it updates directly here
             $product->update([
                 ...collect($data)->except('colors')->toArray(),
                 'status' => $request->boolean('status', true),
@@ -102,42 +96,54 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        DB::transaction(function () use ($product) {
-            foreach ($product->colors as $color) {
-                foreach ($color->images as $image) {
-                    Storage::disk('public')->delete($image->image_path);
-                }
-            }
-            $product->delete(); // colors/images/stock rows cascade via FK
-        });
+        $name = $product->name;
 
-        return back()->with('success', 'Product deleted.');
+        $product->deleteWithFiles();
+
+        return back()->with('success', "Product \"{$name}\" deleted.");
     }
 
     /**
      * Persist "colors[i][color_name/color_code/images[]]" as
      * ProductColor + ProductImage rows for the given product.
+     * color_name may be empty - it's just used as a container for images
+     * when the product doesn't really have color variants.
      */
     private function syncColorsAndImages(Product $product, array $colors): void
     {
         foreach ($colors as $index => $colorData) {
+            // skip a completely empty row (no name, no images) that may
+            // come through from the dynamic form if the user added then
+            // emptied a row without removing it
+            if (empty($colorData['color_name']) && empty($colorData['images'])) {
+                continue;
+            }
+
             $color = ProductColor::create([
                 'product_id' => $product->id,
-                'color_name' => $colorData['color_name'],
+                'color_name' => $colorData['color_name'] ?? null,
                 'color_code' => $colorData['color_code'] ?? null,
                 'sort_order' => $index,
             ]);
 
             foreach (($colorData['images'] ?? []) as $imgIndex => $file) {
-                $path = $file->store('products/'.$product->id, 'public');
+                $path = $this->uploadImage($file, 'uploads/products/'.$product->id);
 
                 ProductImage::create([
                     'product_color_id' => $color->id,
                     'image_path' => $path,
-                    'is_primary' => $imgIndex === 0, // first upload = primary
+                    'is_primary' => $imgIndex === 0,
                     'sort_order' => $imgIndex,
                 ]);
             }
         }
+    }
+
+    private function uploadImage(UploadedFile $file, string $folder): string
+    {
+        $filename = uniqid().'_'.time().'.'.$file->getClientOriginalExtension();
+        $file->move(public_path($folder), $filename);
+
+        return $folder.'/'.$filename;
     }
 }

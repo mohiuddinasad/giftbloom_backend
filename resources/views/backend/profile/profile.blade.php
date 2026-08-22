@@ -148,7 +148,7 @@
                             <label class="form-check-label" for="accountActivation">I confirm my account
                                 deactivation</label>
                         </div>
-                        <button type="submit" class="btn btn-danger deactivate-account">Deactivate Account</button>
+                        <a href="{{ route('profile.destroy') }}" class="btn btn-danger deactivate-account">Deactivate Account</a>
                     </form>
                 </div>
             </div>

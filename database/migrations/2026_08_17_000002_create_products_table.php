@@ -32,8 +32,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->text('short_description')->nullable();
 
-            // total qty is kept in sync by stock_movements, but stored
-            // here for fast reads (avoid summing the log every page load)
+            // qty is edited directly on the product edit form
             $table->integer('qty')->default(0);
 
             // SEO fields

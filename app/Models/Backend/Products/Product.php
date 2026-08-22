@@ -11,7 +11,7 @@ class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
-    // 3. product types
+    // product types
     public const TYPE_GIFT_ITEM = 'gift_item';
     public const TYPE_GIFT_PACKAGE = 'gift_package';
     public const TYPE_LETTER = 'letter';
@@ -22,7 +22,7 @@ class Product extends Model
         self::TYPE_LETTER => 'Letter',
     ];
 
-    // 4. gift for
+    // gift for
     public const GIFT_FOR_MAN = 'man';
     public const GIFT_FOR_WOMEN = 'women';
 
@@ -59,13 +59,6 @@ class Product extends Model
         });
     }
 
-    /**
-     * Tell Laravel to use "slug" instead of "id" for implicit route model
-     * binding, e.g. Route::get('products/{product}', ...) will now look
-     * the product up by slug, and route(..., $product) will build a
-     * slug-based URL automatically. StockController::index()/store() bind
-     * on the same slug since they also type-hint Product.
-     */
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -110,15 +103,9 @@ class Product extends Model
         return $this->hasMany(ProductColor::class);
     }
 
-    // handy shortcut straight to images across all colors
     public function images()
     {
         return $this->hasManyThrough(ProductImage::class, ProductColor::class);
-    }
-
-    public function stockMovements()
-    {
-        return $this->hasMany(StockMovement::class);
     }
 
     // ---- scopes ----
@@ -148,5 +135,25 @@ class Product extends Model
     public function getFinalPriceAttribute()
     {
         return $this->discount_price ?? $this->price;
+    }
+
+    /**
+     * Delete this product along with every uploaded image file that
+     * belongs to its colors (colors/images rows themselves cascade via
+     * the DB foreign keys, but the actual files on disk need to be
+     * removed manually since they live in /public, not a Storage disk).
+     */
+    public function deleteWithFiles(): void
+    {
+        foreach ($this->colors as $color) {
+            foreach ($color->images as $image) {
+                $path = public_path($image->image_path);
+                if (file_exists($path)) {
+                    @unlink($path);
+                }
+            }
+        }
+
+        $this->delete();
     }
 }

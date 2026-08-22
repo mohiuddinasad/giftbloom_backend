@@ -21,7 +21,6 @@ class Category extends Model
         'status' => 'boolean',
     ];
 
-    // auto-generate a unique slug whenever "name" is set
     public static function boot()
     {
         parent::boot();
@@ -33,12 +32,6 @@ class Category extends Model
         });
     }
 
-    /**
-     * Tell Laravel to use "slug" instead of "id" for implicit route model
-     * binding, e.g. Route::get('categories/{category}', ...) will now look
-     * the category up by slug, and route(..., $category) will build a
-     * slug-based URL automatically.
-     */
     public function getRouteKeyName(): string
     {
         return 'slug';
@@ -74,12 +67,6 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    // recursive tree of all descendants (unlimited depth)
-    public function childrenRecursive()
-    {
-        return $this->children()->with('childrenRecursive');
-    }
-
     public function products()
     {
         return $this->hasMany(Product::class);
@@ -99,8 +86,37 @@ class Category extends Model
 
     // ---- accessors ----
 
+    // image column stores a path relative to /public (e.g. "uploads/categories/xxx.jpg")
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? asset('storage/'.$this->image) : null;
+        return $this->image ? asset($this->image) : null;
+    }
+
+    /**
+     * Delete this category AND everything under it:
+     * - all sub-categories (recursively)
+     * - all products in this category and its sub-categories
+     *   (each product's own images/colors are cleaned up too, see Product::deleteWithFiles())
+     * - this category's own image file
+     * - the category row itself
+     */
+    public function deleteWithChildrenAndProducts(): void
+    {
+        foreach ($this->children as $child) {
+            $child->deleteWithChildrenAndProducts();
+        }
+
+        foreach ($this->products as $product) {
+            $product->deleteWithFiles();
+        }
+
+        if ($this->image) {
+            $path = public_path($this->image);
+            if (file_exists($path)) {
+                @unlink($path);
+            }
+        }
+
+        $this->delete();
     }
 }

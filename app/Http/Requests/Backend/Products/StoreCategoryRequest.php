@@ -8,7 +8,7 @@ class StoreCategoryRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // gate/policy check goes here if you use one
+        return true;
     }
 
     public function rules(): array
