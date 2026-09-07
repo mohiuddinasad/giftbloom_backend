@@ -45,8 +45,8 @@
                     </a>
                 </div>
                 <a class="navbar-brand logo m-0" href="{{ route('frontend.home') }}"><img
-                        style="width: 100px; height: auto; object-fit: contain;"
-                        src="{{ asset($setting->site_logo) }}" alt=""></a>
+                        style="width: 100px; height: auto; object-fit: contain;" src="{{ asset($setting->site_logo) }}"
+                        alt=""></a>
 
                 <div class="cart_profile d-lg-none d-flex align-items-center">
                     <a href="{{ route('login') }}" class="user mx-2">
@@ -64,12 +64,16 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ route('frontend.shop') }}">All Gifts
+                            <a class="nav-link active" aria-current="page" href="{{ route('frontend.shop') }}">All
                                 Items</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page"
-                                href="{{ route('frontend.gift-packages') }}">Gift Packages</a>
+                                href="{{ route('frontend.gift-packages') }}"> Packages</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{{ route('frontend.gift.build') }}">
+                                Customize Gift</a>
                         </li>
 
                     </ul>
@@ -151,22 +155,23 @@
             aria-labelledby="offcanvasExampleLabel">
             <div class="offcanvas-header">
                 <a href="">
-                    <img style="width: 150px;
-      height: auto;"
-                        src="{{ asset($setting->site_logo) }}"
-                        alt="">
+                    <img style="width: 150px; height: auto;" src="{{ asset($setting->site_logo) }}" alt="">
                 </a>
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('frontend.shop') }}">All Gifts
+                        <a class="nav-link active" aria-current="page" href="{{ route('frontend.shop') }}">All
                             Items</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page"
-                            href="{{ route('frontend.gift-packages') }}">Gift Packages</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('frontend.gift-packages') }}">
+                            Packages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('frontend.gift.build') }}">
+                            Customize Gift</a>
                     </li>
 
                 </ul>
@@ -216,10 +221,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
 
-            <div class="offcanvas-body">
+            <div class="offcanvas-body d-flex flex-column">
 
                 <!-- cart items list -->
-                <div id="cartItemsList">
+                <div id="cartItemsList" class="flex-grow-1 overflow-auto">
+
                     @forelse ($cart as $key => $item)
                         <div class="cart-item" data-cart-key="{{ $key }}"
                             data-price="{{ $item['price'] }}">
@@ -229,8 +235,6 @@
                                     <div>
                                         <p class="cart-item__name">{{ $item['name'] }}</p>
                                         <p class="cart-item__unit-price">Tk {{ number_format($item['price'], 2) }}</p>
-
-                                        {{-- <p class="cart-item__unit-color">Color: {{ $item['color_name'] }}</p> --}}
                                     </div>
                                     <div class="cart-item__line-total">Tk
                                         {{ number_format($item['price'] * $item['qty'], 2) }}</div>
@@ -251,14 +255,11 @@
                             </div>
                         </div>
                     @empty
-                        <p class="cart-empty">Your cart is empty.</p>
+                        <p class="cart-empty text-center">Your cart is empty.</p>
                     @endforelse
                 </div>
 
                 <div class="cart_footer">
-
-
-
                     <!-- summary -->
                     <div class="cart-summary">
                         <div class="cart-summary__row">
@@ -273,22 +274,22 @@
             </div>
         </div>
 
-        <!---------------------- mobile bottom navbar ---------------------->
-        <!-- <section id="bottomNav" class="d-lg-none">
-            <div class="container">
-                <div class="row">
-                    <div class="col-6">
 
-                    </div>
-                </div>
-            </div>
-        </section> -->
     </header>
 
 
 
     @yield('frontend_content')
     <!---------------------- footer  ---------------------->
+    {{-- preloader --}}
+    <div class="preloader" id="preloader">
+        <div class="loader">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <div class="core"></div>
+        </div>
+    </div>
 
     <footer class="site-footer">
         <div class="container">
@@ -426,7 +427,18 @@
         });
     </script>
 
-
+    <script>
+        window.addEventListener('load', function() {
+            var preloader = document.getElementById('preloader');
+            setTimeout(function() {
+                preloader.style.opacity = '0';
+                preloader.style.transition = 'opacity 0.4s ease';
+                setTimeout(function() {
+                    preloader.style.display = 'none';
+                }, 400);
+            }, 600);
+        });
+    </script>
 
 </body>
 

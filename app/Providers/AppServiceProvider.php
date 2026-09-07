@@ -41,9 +41,8 @@ class AppServiceProvider extends ServiceProvider
                 ->parents()
                 ->get();
 
-            $products = Product::with('category')->get();
             $view->with('categories', $categories);
-            $view->with('products', $products);
+        
             $view->with('setting', $setting);
         });
     }

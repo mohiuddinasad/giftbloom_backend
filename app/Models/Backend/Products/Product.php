@@ -13,17 +13,32 @@ class Product extends Model
 
     // product types
     public const TYPE_GIFT_ITEM = 'gift_item';
+
     public const TYPE_GIFT_PACKAGE = 'gift_package';
+
     public const TYPE_LETTER = 'letter';
+
+    public const TYPE_GIFT_BOX = 'gift_box';
+
+    public const TYPE_EXTAR_GIFT = 'extra_gift';
+
+    public const TYPE_SWEET = 'sweet';
+
+    public const TYPE_WRAPING = 'wraping';
 
     public const TYPES = [
         self::TYPE_GIFT_ITEM => 'Gift Item',
         self::TYPE_GIFT_PACKAGE => 'Gift Package',
         self::TYPE_LETTER => 'Letter',
+        self::TYPE_GIFT_BOX => 'Gift box',
+        self::TYPE_EXTAR_GIFT => 'Extars',
+        self::TYPE_SWEET => 'Sweet',
+        self::TYPE_WRAPING => 'Wraping',
     ];
 
     // gift for
     public const GIFT_FOR_MAN = 'man';
+
     public const GIFT_FOR_WOMEN = 'women';
 
     public const GIFT_FOR = [
@@ -32,10 +47,9 @@ class Product extends Model
     ];
 
     protected $fillable = [
-        'category_id', 'name', 'slug', 'sku', 'type', 'gift_for',
-        'price', 'discount_price', 'description', 'short_description',
-        'qty', 'meta_title', 'meta_description', 'meta_keywords',
-        'status', 'is_featured',
+        'category_id', 'name', 'slug', 'sku', 'type', 'gift_for', 'price',
+        'discount_price', 'description', 'short_description', 'qty',
+        'meta_title', 'meta_description', 'meta_keywords', 'status', 'is_featured',
     ];
 
     protected $casts = [
@@ -92,7 +106,6 @@ class Product extends Model
     }
 
     // ---- relationships ----
-
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -109,7 +122,6 @@ class Product extends Model
     }
 
     // ---- scopes ----
-
     public function scopeActive($query)
     {
         return $query->where('status', true);
@@ -126,7 +138,6 @@ class Product extends Model
     }
 
     // ---- accessors ----
-
     public function getInStockAttribute(): bool
     {
         return $this->qty > 0;
@@ -134,7 +145,57 @@ class Product extends Model
 
     public function getFinalPriceAttribute()
     {
-        return $this->discount_price ?? $this->price;
+        return $this->price;
+    }
+
+    /**
+     * 'in_stock' | 'limited' | 'out_of_stock' — used to drive the
+     * stock badge on the gift-box product cards.
+     */
+    public function getStockLevelAttribute(): string
+    {
+        if ($this->qty <= 0) {
+            return 'out_of_stock';
+        }
+
+        return $this->qty <= 5 ? 'limited' : 'in_stock';
+    }
+
+    /**
+     * Color options for the "Add to box" popup, e.g.
+     * [['id' => 3, 'name' => 'Gold'], ...]
+     * Falls back to an empty array when the product has no colors,
+     * so the frontend JS shows the popup without a color picker.
+     */
+    public function colorOptions(): array
+    {
+        return $this->colors->map(fn ($color) => [
+            'id' => $color->id,
+            'name' => $color->color_name,
+            'images' => $color->images->map(fn ($image) => asset($image->image_path))->values()->all(),
+        ])->values()->all();
+    }
+
+    /**
+     * All image URLs across every color, for the popup thumbnail strip.
+     */
+    public function imageUrls(): array
+    {
+        return $this->colors
+            ->flatMap(fn ($color) => $color->images)
+            ->map(fn ($image) => asset($image->image_path))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * The image shown on the card itself / as the popup's main image.
+     */
+    public function mainImageUrl(): ?string
+    {
+        $image = $this->colors->first()?->images->first();
+
+        return $image ? asset($image->image_path) : asset('asset/image/placeholder.jpg');
     }
 
     /**

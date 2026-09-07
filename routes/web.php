@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Backend\Banners\BannersController;
+use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\Orders\OrderController;
 use App\Http\Controllers\Backend\Products\CategoryController;
 use App\Http\Controllers\Backend\Products\ProductController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Backend\Profile\MyProfileController;
 use App\Http\Controllers\Backend\RolePermission\RolePermissionController;
 use App\Http\Controllers\Backend\Settings\SettingsController;
 use App\Http\Controllers\Frontend\Cart\CartController;
+use App\Http\Controllers\Frontend\GiftboxController;
 use App\Http\Controllers\Frontend\IndexController;
 use App\Http\Controllers\Frontend\ProductDetailsController;
 use App\Http\Controllers\Frontend\ShopController;
@@ -28,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 // backend routes
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'not-customer'])->name('dashboard');
 Route::prefix('dashboard/')->name('dashboard.')->middleware(['auth', 'not-customer'])->group(function () {
 
     // profile routes
@@ -98,9 +101,15 @@ Route::prefix('dashboard/')->name('dashboard.')->middleware(['auth', 'not-custom
         Route::put('/', [SettingsController::class, 'update'])->name('update')->middleware('can:setting-edit');
     });
 });
-// frontend routes
+ 
+// frontends route
 Route::prefix('/')->name('frontend.')->group(function () {
+
     Route::get('/', [IndexController::class, 'index'])->name('home');
+
+    // Perfect Picks / Gift For
+    Route::get('/gift-for/{giftFor}', [ShopController::class, 'giftFor'])
+        ->name('gift.for');
 
     // cart routes
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
@@ -110,18 +119,29 @@ Route::prefix('/')->name('frontend.')->group(function () {
 
     // product search
     Route::get('/search', [IndexController::class, 'search'])->name('search');
+
     // shop routes
     Route::get('/shop', [ShopController::class, 'index'])->name('shop');
-    Route::get('/category/{slug}', [ShopController::class, 'categoryWiseProduct'])->name('category-wise-product');
-    Route::get('/gift-packages', [ShopController::class, 'giftPackages'])->name('gift-packages');
+    Route::get('/category/{slug}', [ShopController::class, 'categoryWiseProduct'])
+        ->name('category-wise-product');
+
+    Route::get('/gift-packages', [ShopController::class, 'giftPackages'])
+        ->name('gift-packages');
+    // custom gift
+    Route::get('/gift-build', [GiftboxController::class, 'index'])
+        ->name('gift.build');
+
+    Route::post('/gift-build/checkout', [GiftboxController::class, 'store'])
+        ->name('gift.build.store');
+
 
     // products details route
-    Route::get('/product/{slug}', [ProductDetailsController::class, 'productDetails'])->name('product.details');
+    Route::get('/product/{slug}', [ProductDetailsController::class, 'productDetails'])
+        ->name('product.details');
 
     Route::get('/checkout', [IndexController::class, 'checkout'])->name('checkout');
-
     Route::post('/checkout', [IndexController::class, 'store'])->name('checkout.store');
-    Route::get('/order/success/{order_code}', [IndexController::class, 'success'])->name('order.success');
-
+    Route::get('/order/success/{order_code}', [IndexController::class, 'success'])
+        ->name('order.success');
 });
 require __DIR__.'/auth.php';

@@ -3,12 +3,114 @@ document.addEventListener("DOMContentLoaded", function () {
     const videoCards = document.querySelectorAll(".video-card");
 
     const modal = document.getElementById("videoModal");
+    const previewVideo = document.getElementById("previewVideo");
+    const closeVideo = document.getElementById("closeVideo");
 
-    const previewVideo =
-        document.getElementById("previewVideo");
 
-    const closeVideo =
-        document.getElementById("closeVideo");
+    /*
+    ========================================
+    CHECK HLS URL
+    ========================================
+    */
+
+    function isHLS(videoURL) {
+
+        if (!videoURL) {
+            return false;
+        }
+
+        return /\.m3u8(?:\?|#|$)/i.test(videoURL);
+    }
+
+
+    /*
+    ========================================
+    DESTROY HLS INSTANCE
+    ========================================
+    */
+
+    function destroyHLS(video) {
+
+        if (video && video.hlsInstance) {
+
+            video.hlsInstance.destroy();
+
+            video.hlsInstance = null;
+        }
+    }
+
+
+    /*
+    ========================================
+    LOAD NORMAL MP4 VIDEO
+    ========================================
+    */
+
+    function loadNormalVideo(video, videoURL) {
+
+        if (!video || !videoURL) {
+            return;
+        }
+
+        destroyHLS(video);
+
+        video.pause();
+
+        video.removeAttribute("src");
+
+        video.load();
+
+
+        video.src = videoURL;
+
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+
+
+        /*
+        Video load হলে play করার চেষ্টা
+        */
+
+        video.addEventListener(
+            "loadeddata",
+            function () {
+
+                video.play().catch(function (error) {
+
+                    console.log(
+                        "Normal video autoplay blocked:",
+                        error
+                    );
+
+                });
+
+            },
+            { once: true }
+        );
+
+
+        /*
+        Video error
+        */
+
+        video.addEventListener(
+            "error",
+            function () {
+
+                console.log(
+                    "Video loading error:",
+                    videoURL,
+                    video.error
+                );
+
+            },
+            { once: true }
+        );
+
+
+        video.load();
+    }
 
 
     /*
@@ -19,64 +121,140 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function loadHLS(video, videoURL) {
 
+        if (!video || !videoURL) {
+            return;
+        }
+
+
         /*
-        Chrome / Edge / Firefox
+        আগে পুরোনো HLS destroy
         */
 
-        if (Hls.isSupported()) {
+        destroyHLS(video);
 
-            const hls = new Hls();
+
+        /*
+        ====================================
+        Chrome / Edge / Firefox
+        ====================================
+        */
+
+        if (
+            typeof Hls !== "undefined" &&
+            Hls.isSupported()
+        ) {
+
+            const hls = new Hls({
+
+                enableWorker: true,
+
+                lowLatencyMode: false
+
+            });
+
 
             hls.loadSource(videoURL);
 
             hls.attachMedia(video);
 
-            /*
-            Video ready হলে autoplay
-            */
-
-            hls.on(Hls.Events.MANIFEST_PARSED, function () {
-
-                video.play().catch(function (error) {
-
-                    console.log(
-                        "Autoplay blocked:",
-                        error
-                    );
-
-                });
-
-            });
-
 
             /*
-            HLS error handling
-            */
-
-            hls.on(Hls.Events.ERROR, function (
-                event,
-                data
-            ) {
-
-                console.log(
-                    "HLS Error:",
-                    data
-                );
-
-            });
-
-
-            /*
-            HLS instance video-এর সাথে
-            store করে রাখছি
+            HLS instance store
             */
 
             video.hlsInstance = hls;
 
+
+            /*
+            Manifest ready
+            */
+
+            hls.on(
+                Hls.Events.MANIFEST_PARSED,
+                function () {
+
+                    video.play().catch(function (error) {
+
+                        console.log(
+                            "HLS autoplay blocked:",
+                            error
+                        );
+
+                    });
+
+                }
+            );
+
+
+            /*
+            HLS error
+            */
+
+            hls.on(
+                Hls.Events.ERROR,
+                function (event, data) {
+
+                    console.log(
+                        "HLS Error:",
+                        data
+                    );
+
+
+                    /*
+                    Fatal error হলে recover করার চেষ্টা
+                    */
+
+                    if (data.fatal) {
+
+                        switch (data.type) {
+
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+
+                                console.log(
+                                    "HLS network error. Restarting..."
+                                );
+
+                                hls.startLoad();
+
+                                break;
+
+
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+
+                                console.log(
+                                    "HLS media error. Recovering..."
+                                );
+
+                                hls.recoverMediaError();
+
+                                break;
+
+
+                            default:
+
+                                console.log(
+                                    "Fatal HLS error."
+                                );
+
+                                hls.destroy();
+
+                                video.hlsInstance = null;
+
+                                break;
+                        }
+
+                    }
+
+                }
+            );
+
         }
 
+
         /*
+        ====================================
         Safari / iPhone / iPad
+        ====================================
         */
 
         else if (
@@ -87,20 +265,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             video.src = videoURL;
 
+
             video.addEventListener(
                 "loadedmetadata",
                 function () {
 
-                    video.play().catch(
-                        function (error) {
+                    video.play().catch(function (error) {
 
-                            console.log(
-                                "Autoplay blocked:",
-                                error
-                            );
+                        console.log(
+                            "Safari HLS autoplay blocked:",
+                            error
+                        );
 
-                        }
-                    );
+                    });
 
                 },
                 { once: true }
@@ -108,16 +285,82 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
+
+        /*
+        ====================================
+        HLS Not Supported
+        ====================================
+        */
+
         else {
 
             console.log(
-                "HLS is not supported in this browser."
+                "HLS is not supported in this browser:",
+                videoURL
             );
 
         }
 
     }
 
+
+    /*
+    ========================================
+    LOAD VIDEO AUTOMATICALLY
+    ========================================
+    */
+
+    function loadVideo(video, videoURL) {
+
+        if (!video || !videoURL) {
+
+            console.log(
+                "Video URL not found."
+            );
+
+            return;
+        }
+
+
+        /*
+        Common settings
+        */
+
+        video.muted = true;
+
+        video.loop = true;
+
+        video.playsInline = true;
+
+
+        /*
+        HLS হলে HLS player
+        */
+
+        if (isHLS(videoURL)) {
+
+            loadHLS(
+                video,
+                videoURL
+            );
+
+        }
+
+
+        /*
+        MP4 / normal video হলে
+        */
+
+        else {
+
+            loadNormalVideo(
+                video,
+                videoURL
+            );
+
+        }
+
+    }
 
 
     /*
@@ -131,18 +374,31 @@ document.addEventListener("DOMContentLoaded", function () {
         const video =
             card.querySelector("video");
 
+
+        if (!video) {
+            return;
+        }
+
+
         const videoURL =
             video.getAttribute("data-video");
 
 
-        video.muted = true;
+        if (!videoURL) {
 
-        video.loop = true;
+            console.log(
+                "Video URL missing from card."
+            );
 
-        video.playsInline = true;
+            return;
+        }
 
 
-        loadHLS(
+        /*
+        Load video
+        */
+
+        loadVideo(
             video,
             videoURL
         );
@@ -168,7 +424,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
-
     /*
     ========================================
     OPEN VIDEO PREVIEW
@@ -177,14 +432,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function openVideoPreview(videoURL) {
 
+        if (!modal || !previewVideo) {
+            return;
+        }
+
+
+        if (!videoURL) {
+            return;
+        }
+
+
+        /*
+        Open modal
+        */
+
         modal.classList.add("active");
 
 
         /*
-        Preview video reset
+        Stop previous video
         */
 
         previewVideo.pause();
+
+
+        /*
+        Destroy previous HLS
+        */
+
+        destroyHLS(
+            previewVideo
+        );
+
+
+        /*
+        Reset video
+        */
 
         previewVideo.removeAttribute("src");
 
@@ -199,113 +482,244 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /*
-        Load HLS
+        ====================================
+        HLS PREVIEW
+        ====================================
         */
 
-        if (Hls.isSupported()) {
-
-            const previewHls =
-                new Hls();
-
-            previewHls.loadSource(
-                videoURL
-            );
-
-            previewHls.attachMedia(
-                previewVideo
-            );
+        if (isHLS(videoURL)) {
 
 
-            previewHls.on(
-                Hls.Events.MANIFEST_PARSED,
+            /*
+            Chrome / Edge / Firefox
+            */
+
+            if (
+                typeof Hls !== "undefined" &&
+                Hls.isSupported()
+            ) {
+
+                const previewHls =
+                    new Hls({
+
+                        enableWorker: true,
+
+                        lowLatencyMode: false
+
+                    });
+
+
+                previewHls.loadSource(
+                    videoURL
+                );
+
+                previewHls.attachMedia(
+                    previewVideo
+                );
+
+
+                /*
+                Store HLS instance
+                */
+
+                previewVideo.hlsInstance =
+                    previewHls;
+
+
+                /*
+                Manifest ready
+                */
+
+                previewHls.on(
+                    Hls.Events.MANIFEST_PARSED,
+                    function () {
+
+                        previewVideo.play().catch(
+                            function (error) {
+
+                                console.log(
+                                    "Preview HLS autoplay error:",
+                                    error
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                /*
+                HLS Error
+                */
+
+                previewHls.on(
+                    Hls.Events.ERROR,
+                    function (event, data) {
+
+                        console.log(
+                            "Preview HLS Error:",
+                            data
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /*
+            Safari
+            */
+
+            else if (
+                previewVideo.canPlayType(
+                    "application/vnd.apple.mpegurl"
+                )
+            ) {
+
+                previewVideo.src =
+                    videoURL;
+
+
+                previewVideo.addEventListener(
+                    "loadedmetadata",
+                    function () {
+
+                        previewVideo.play().catch(
+                            function (error) {
+
+                                console.log(
+                                    "Safari preview autoplay error:",
+                                    error
+                                );
+
+                            }
+                        );
+
+                    },
+                    { once: true }
+                );
+
+            }
+
+
+            /*
+            HLS unsupported
+            */
+
+            else {
+
+                console.log(
+                    "HLS is not supported."
+                );
+
+            }
+
+        }
+
+
+        /*
+        ====================================
+        NORMAL MP4 PREVIEW
+        ====================================
+        */
+
+        else {
+
+            previewVideo.src =
+                videoURL;
+
+
+            previewVideo.addEventListener(
+                "loadeddata",
                 function () {
 
                     previewVideo.play().catch(
                         function (error) {
 
                             console.log(
-                                "Preview autoplay error:",
+                                "MP4 preview autoplay error:",
                                 error
                             );
 
                         }
                     );
 
-                }
+                },
+                { once: true }
             );
 
 
             /*
-            Store HLS instance
+            Normal video error
             */
 
-            previewVideo.hlsInstance =
-                previewHls;
-
-        }
-
-        /*
-        Safari
-        */
-
-        else if (
-            previewVideo.canPlayType(
-                "application/vnd.apple.mpegurl"
-            )
-        ) {
-
-            previewVideo.src =
-                videoURL;
-
             previewVideo.addEventListener(
-                "loadedmetadata",
+                "error",
                 function () {
 
-                    previewVideo.play();
+                    console.log(
+                        "Preview video error:",
+                        previewVideo.error
+                    );
 
                 },
                 { once: true }
             );
+
+
+            previewVideo.load();
 
         }
 
     }
 
 
-
     /*
     ========================================
-    CLOSE VIDEO
+    CLOSE VIDEO PREVIEW
     ========================================
     */
 
     function closePreview() {
 
+        if (!previewVideo || !modal) {
+            return;
+        }
+
+
+        /*
+        Pause video
+        */
+
         previewVideo.pause();
 
 
         /*
-        Destroy HLS instance
+        Destroy HLS
         */
 
-        if (
-            previewVideo.hlsInstance
-        ) {
+        destroyHLS(
+            previewVideo
+        );
 
-            previewVideo.hlsInstance.destroy();
 
-            previewVideo.hlsInstance =
-                null;
-
-        }
-
+        /*
+        Remove source
+        */
 
         previewVideo.removeAttribute(
             "src"
         );
 
+
         previewVideo.load();
 
+
+        /*
+        Close modal
+        */
 
         modal.classList.remove(
             "active"
@@ -314,20 +728,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-
     /*
+    ========================================
     CLOSE BUTTON
+    ========================================
     */
 
-    closeVideo.addEventListener(
-        "click",
-        function () {
+    if (closeVideo) {
 
-            closePreview();
+        closeVideo.addEventListener(
+            "click",
+            function () {
 
-        }
-    );
+                closePreview();
 
+            }
+        );
+
+    }
 
 
     /*
@@ -336,21 +754,24 @@ document.addEventListener("DOMContentLoaded", function () {
     ========================================
     */
 
-    modal.addEventListener(
-        "click",
-        function (event) {
+    if (modal) {
 
-            if (
-                event.target === modal
-            ) {
+        modal.addEventListener(
+            "click",
+            function (event) {
 
-                closePreview();
+                if (
+                    event.target === modal
+                ) {
+
+                    closePreview();
+
+                }
 
             }
+        );
 
-        }
-    );
-
+    }
 
 
     /*
@@ -368,6 +789,7 @@ document.addEventListener("DOMContentLoaded", function () {
             ) {
 
                 if (
+                    modal &&
                     modal.classList.contains(
                         "active"
                     )
@@ -380,6 +802,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
         }
-    ); 
+    );
 
 });

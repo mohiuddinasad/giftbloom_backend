@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique(); // used for both SEO url AND route binding
             $table->string('sku')->unique();
-
+ 
             // 1. product type: gift item / gift package / letter
-            $table->enum('type', ['gift_item', 'gift_package', 'letter'])
+            $table->enum('type', ['gift_item', 'gift_package', 'letter','gift_box','extra_gift','sweet','wraping'])
                 ->default('gift_item');
 
             // 2. who the gift is for

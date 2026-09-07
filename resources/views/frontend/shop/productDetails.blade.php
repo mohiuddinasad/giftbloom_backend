@@ -227,7 +227,7 @@
                         <div class="col-lg-3 col-6">
                             <div class="product-card">
                                 <div class="product-image">
-                                    <a href="{{ route('frontend.product.details', $product->slug) }}">
+                                    <a href="{{ route('frontend.product.details', $related->slug) }}">
                                         <img src="{{ $related->colors->first()?->images->first()?->url }}"
                                             alt="{{ $related->name }}">
                                     </a>

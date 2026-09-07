@@ -73,7 +73,7 @@
             </div>
 
             <div class="d-flex justify-content-end">
-                {{ $banners->links() }}
+                {{ $banners->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>

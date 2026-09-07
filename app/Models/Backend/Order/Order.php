@@ -14,7 +14,7 @@ class Order extends Model
     protected $fillable = [
         'order_code', 'customer_name', 'phone', 'address', 'area', 'city',
         'note', 'shipping_method', 'shipping_cost', 'subtotal', 'total',
-        'payment_method', 'status',
+        'payment_method', 'status', 'gift_recipient_name', 'gift_message',
     ];
 
     public const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];

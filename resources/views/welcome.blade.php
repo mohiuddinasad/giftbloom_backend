@@ -3,101 +3,107 @@
 @section('frontend_title')
     Giftbloom | Home
 @endsection
+@push('frontend_css')
+    <style>
+        .perfect-picks .contain h4 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
 
+        .pick-card {
+            position: relative;
+            background: #e7d9c9;
+            border-radius: 14px;
+            overflow: hidden;
+            height: 220px;
+            display: flex;
+            align-items: center;
+        }
+
+        .pick-text {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            z-index: 2;
+        }
+
+        .pick-text h5 {
+            font-weight: 700;
+            font-size: 26px;
+            line-height: 1.2;
+            color: #1a1a1a;
+            margin: 0;
+        }
+
+        .pick-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: right center;
+        }
+
+        @media (max-width: 767px) {
+            .pick-card {
+                height: 180px;
+            }
+
+            .pick-text h5 {
+                font-size: 20px;
+            }
+        }
+    </style>
+@endpush
 @section('frontend_content')
     <section id="banner">
         <div class="container-fluid p-0">
             <div class="banner_slide">
-                <div class="slider">
-                    <img class="img-fluid" src="{{ asset('frontend/asset/image/banner/new_banner_1.webp') }}"
-                        alt="Banner Image">
-                </div>
-                <div class="slider">
-                    <img class="img-fluid"
-                        src="{{ asset('frontend/asset/image/banner/Delivery_1_fcc80ebc-e766-43be-ab9b-d5c9feba90b6.webp') }}"
-                        alt="Banner Image">
-                </div>
+                @foreach ($imageBanners as $banner)
+                    <div class="slider">
+                        <img style="width: 100%; object-fit: cover; height: 330px;" class="img-fluid"
+                            src="{{ asset($banner->image) }}" alt="Banner Image">
+                    </div>
+                @endforeach
+
             </div>
         </div>
 
     </section>
 
     <!-- perfrctpicks -->
-    <section id="perfect" class="py-4">
+    <section id="perfect" class="py-4 perfect-picks">
         <div class="container">
             <div class="contain">
-                <h4>Perfect Picks for Every Relationship
-                </h4>
+                <h4>Perfect Picks for Every Relationship</h4>
             </div>
-            <div class="row">
+            <div class="row g-3 mt-2">
 
-                <div class="category-row">
+                <div class="col-md-4">
+                    <a href="{{ route('frontend.gift.for', 'man') }}" class="pick-card d-block text-decoration-none">
 
-                    <a class="category-card" href="#" aria-label="For Her">
-                        <div class="card-image">
-                            <img src="{{ asset('https://picsum.photos/seed/formom/400/420') }}" alt="For Her">
-                        </div>
-                        <div class="card-label">For Her</div>
+                        <img src="{{ asset('frontend/asset/image/1.jpg') }}" alt="Gift For Him" class="pick-img img-fluid">
                     </a>
-
-                    <div class="card-divider">
-                        <span class="divider-icon">
-                            <iconify-icon icon="lets-icons:bag" width="24" height="24"></iconify-icon>
-                        </span>
-                    </div>
-
-                    <a class="category-card" href="#" aria-label="For Him">
-                        <div class="card-image">
-                            <img src="{{ asset('https://picsum.photos/seed/forhim/400/420') }}" alt="For Him">
-                        </div>
-                        <div class="card-label">For Him</div>
-                    </a>
-
-                    <div class="card-divider">
-                        <span class="divider-icon">
-                            <iconify-icon icon="lets-icons:bag" width="24" height="24"></iconify-icon>
-                        </span>
-                    </div>
-
-                    <a class="category-card" href="#" aria-label="For Mom">
-                        <div class="card-image">
-                            <img src="https://picsum.photos/seed/formom/400/420" alt="For Mom">
-                        </div>
-                        <div class="card-label">For Mom</div>
-                    </a>
-
-                    <div class="card-divider">
-                        <span class="divider-icon">
-                            <iconify-icon icon="lets-icons:bag" width="24" height="24"></iconify-icon>
-                        </span>
-                    </div>
-
-                    <a class="category-card" href="#" aria-label="For dad">
-                        <div class="card-image">
-                            <img src="https://picsum.photos/seed/fordad/400/420" alt="For dad">
-                        </div>
-                        <div class="card-label">For dad</div>
-                    </a>
-
-                    <div class="card-divider">
-                        <span class="divider-icon">
-                            <iconify-icon icon="lets-icons:bag" width="24" height="24"></iconify-icon>
-                        </span>
-                    </div>
-
-                    <a class="category-card" href="#" aria-label="For Best Friend">
-                        <div class="card-image">
-                            <img src="https://picsum.photos/seed/forbestfriend/400/420" alt="For Best Friend">
-                        </div>
-                        <div class="card-label">For Friend</div>
-                    </a>
-
                 </div>
+
+                <div class="col-md-4">
+                    <a href="{{ route('frontend.gift.for', 'women') }}" class="pick-card d-block text-decoration-none">
+
+                        <img src="{{ asset('frontend/asset/image/2.jpg') }}" alt="Gift For Her" class="pick-img img-fluid">
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="{{ route('frontend.shop') }}"
+                        class="pick-card d-block text-decoration-none">
+
+                        <img src="{{ asset('frontend/asset/image/3.jpg') }}" alt="Gift For Friend" class="pick-img img-fluid">
+                    </a>
+                </div>
+
             </div>
         </div>
     </section>
-    <hr>
 
+    <hr>
 
 
     <!-- products -->
@@ -105,7 +111,7 @@
         <div class="container">
             <div class="contain d-flex justify-content-between align-items-center mb-4">
                 <h4>Ready To Go Gift Packages</h4>
-                <a href="" style="color: #E8A99C;">View All</a>
+                <a href="{{ route('frontend.gift-packages') }}" style="color: #E8A99C;">View All</a>
             </div>
             <div class="row g-4">
                 @foreach ($giftPakageProducts as $product)
@@ -151,20 +157,20 @@
                 <div class="col-lg-6">
                     <div class="wraping">
 
-                        <img class=""
-                            src="https://prezentobd.com/cdn/shop/files/ezgif-70903d5ed8ed67.gif?v=1759782763&width=1000"
-                            alt="Gift Wraping">
+                        <img class="" src="{{ asset('frontend/asset/image/custom.jpg') }}" alt="Gift Wraping">
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="gift-wraping-content">
-                        <h4>DON'T FORGET TO ADD WRAPPING
+                        <h4>Customize Your Own Gift
                         </h4>
-                        <p>Complete your purchase with our elegant gift wrapping — beautifully packaged in a premium box
-                            for only 200 ৳. Make every gift extra special!
+                        <p>
+                            Add a personal touch to your gift with our customizable wrapping options. Choose from a variety
+                            of colors, patterns, and materials to create a unique presentation that reflects your style and
+                            the recipient's taste. Make your gift truly special with our personalized wrapping services.
 
                         </p>
-                        <a href="" class="btn btn-primary">Add Wrapping</a>
+                        <a href="{{ route('frontend.gift.build') }}" class="btn btn-primary">Customize Now</a>
                     </div>
                 </div>
             </div>
@@ -222,11 +228,11 @@
         <div class="container">
             <div class="contain d-flex justify-content-between align-items-center mb-4">
                 <h4>Pick Your Favorites</h4>
-                <a style="color: #E8A99C;" href="">View All</a>
+                <a style="color: #E8A99C;" href="{{ route('frontend.shop') }}">View All</a>
             </div>
             <div class="row g-4">
                 @foreach ($giftItemProducts as $product)
-                     @php
+                    @php
                         $hasColors = $product->colors->filter(fn($c) => filled($c->color_name))->isNotEmpty();
                     @endphp
                     <div class="col-lg-3 col-6">
@@ -240,8 +246,8 @@
                                     <button class="cart-btn" aria-label="Add to cart" data-product-id="{{ $product->id }}"
                                         data-color-id="{{ $product->colors->first()?->id }}">
                                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <rect x="3" y="7" width="18" height="12" rx="2" stroke="currentColor"
-                                                stroke-width="1.6" />
+                                            <rect x="3" y="7" width="18" height="12" rx="2"
+                                                stroke="currentColor" stroke-width="1.6" />
                                             <path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"
                                                 stroke="currentColor" stroke-width="1.6" />
                                             <path d="M3 12h18" stroke="currentColor" stroke-width="1.6" />
@@ -267,52 +273,23 @@
 
         <div class="video-container">
 
-            <div class="video-card">
-                <video class="hls-video"
-                    data-video="https://cdn.shopify.com/videos/c/vp/ca99d18f29f14ff3b29b0c7ff3288159/ca99d18f29f14ff3b29b0c7ff3288159.m3u8"
-                    autoplay muted loop playsinline>
-                </video>
-            </div>
 
 
-            <div class="video-card">
-                <video class="hls-video"
-                    data-video="https://cdn.shopify.com/videos/c/vp/ca99d18f29f14ff3b29b0c7ff3288159/ca99d18f29f14ff3b29b0c7ff3288159.m3u8"
-                    autoplay muted loop playsinline>
-                </video>
-            </div>
-            <div class="video-card">
-                <video class="hls-video"
-                    data-video="https://cdn.shopify.com/videos/c/vp/ca99d18f29f14ff3b29b0c7ff3288159/ca99d18f29f14ff3b29b0c7ff3288159.m3u8"
-                    autoplay muted loop playsinline>
-                </video>
-            </div>
-            <div class="video-card">
-                <video class="hls-video"
-                    data-video="https://cdn.shopify.com/videos/c/vp/ca99d18f29f14ff3b29b0c7ff3288159/ca99d18f29f14ff3b29b0c7ff3288159.m3u8"
-                    autoplay muted loop playsinline>
-                </video>
-            </div>
-            <div class="video-card">
-                <video class="hls-video"
-                    data-video="https://cdn.shopify.com/videos/c/vp/ca99d18f29f14ff3b29b0c7ff3288159/ca99d18f29f14ff3b29b0c7ff3288159.m3u8"
-                    autoplay muted loop playsinline>
-                </video>
-            </div>
-            <div class="video-card">
-                <video class="hls-video"
-                    data-video="https://cdn.shopify.com/videos/c/vp/ca99d18f29f14ff3b29b0c7ff3288159/ca99d18f29f14ff3b29b0c7ff3288159.m3u8"
-                    autoplay muted loop playsinline>
-                </video>
-            </div>
+            @foreach ($videoBanners as $banner)
+                <div class="video-card">
+                    <video class="hls-video" data-video="{{ $banner->video_url }}" autoplay muted loop playsinline>
+                    </video>
+                </div>
+            @endforeach
+
 
         </div>
 
 
 
         <!-- =========================
-                     VIDEO PREVIEW MODAL
-                ========================= -->
+                                                     VIDEO PREVIEW MODAL
+                                                ========================= -->
 
         <div class="video-modal" id="videoModal">
 

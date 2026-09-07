@@ -90,6 +90,24 @@
                 </div>
             </div>
 
+            @if ($order->gift_recipient_name || $order->gift_message)
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-header bg-white fw-semibold">
+                        <i class="fa-solid fa-envelope me-1"></i> Gift Message
+                    </div>
+                    <div class="card-body">
+                        @if ($order->gift_recipient_name)
+                            <div class="text-muted small">To</div>
+                            <div class="fw-semibold mb-2">{{ $order->gift_recipient_name }}</div>
+                        @endif
+                        @if ($order->gift_message)
+                            <div class="text-muted small">Message</div>
+                            <div style="white-space: pre-line;">{{ $order->gift_message }}</div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
         </div>
 
         <!-- RIGHT: status + totals -->

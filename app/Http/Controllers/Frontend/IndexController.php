@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Backend\Banners\Banners;
 use App\Models\Backend\Order\Order;
 use App\Models\Backend\Products\Category;
 use App\Models\Backend\Products\Product;
@@ -17,12 +18,14 @@ class IndexController extends Controller
             ->withCount('products')
             ->parents()
             ->get();
+
         $giftPakageProducts = Product::where('type', 'gift_package')
             ->where('status', true)
             ->with(['colors.images'])
             ->latest()
             ->take(8)
             ->get();
+
         $giftItemProducts = Product::where('type', 'gift_item')
             ->where('status', true)
             ->with(['colors.images'])
@@ -30,8 +33,28 @@ class IndexController extends Controller
             ->take(8)
             ->get();
 
-        return view('welcome', compact('giftPakageProducts', 'giftItemProducts', 'categories'));
+        // Only image banners
+        $imageBanners = Banners::whereNotNull('image')
+            ->where('image', '!=', '')
+            ->latest()
+            ->get();
+
+        // Only video banners
+        $videoBanners = Banners::whereNotNull('video')
+            ->where('video', '!=', '')
+            ->latest()
+            ->get();
+
+        return view('welcome', compact(
+            'giftPakageProducts',
+            'giftItemProducts',
+            'categories',
+            'imageBanners',
+            'videoBanners'
+        ));
     }
+
+
     //   oreder part
 
     public function checkout()
@@ -62,7 +85,11 @@ class IndexController extends Controller
         $subtotal = collect($cart)->sum(fn ($item) => $item['price'] * $item['qty']);
         $total = $subtotal + $shippingCost;
 
-        $order = DB::transaction(function () use ($validated, $cart, $shippingCost, $subtotal, $total) {
+        // Pulled from GiftboxController::store() — set when the customer
+        // finished the "Cards" step of the gift-box builder.
+        $giftBoxLetter = session()->get('gift_box_letter', []);
+
+        $order = DB::transaction(function () use ($validated, $cart, $shippingCost, $subtotal, $total, $giftBoxLetter) {
             $order = Order::create([
                 'order_code' => Order::generateOrderCode(),
                 'customer_name' => $validated['full_name'],
@@ -77,6 +104,8 @@ class IndexController extends Controller
                 'total' => $total,
                 'payment_method' => 'cod',
                 'status' => 'pending',
+                'gift_recipient_name' => $giftBoxLetter['recipient_name'] ?? null,
+                'gift_message' => $giftBoxLetter['message'] ?? null,
             ]);
 
             foreach ($cart as $item) {
@@ -94,6 +123,7 @@ class IndexController extends Controller
         });
 
         session()->forget('cart');
+        session()->forget('gift_box_letter');
 
         return response()->json([
             'success' => true,

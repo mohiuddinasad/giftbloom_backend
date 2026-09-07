@@ -1,11 +1,43 @@
 @php
     $cart = session()->get('cart', []);
     $cartTotal = collect($cart)->sum(fn($item) => $item['price'] * $item['qty']);
+    $giftBoxLetter = session()->get('gift_box_letter');
 @endphp
 
 @extends('frontend.layout')
 
 @section('frontend_title', 'Shop')
+
+@push('frontend_css')
+<style>
+    .co-summary-letter {
+        border: 1px dashed var(--color-border, #E8D5C4);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin: 4px 0 20px;
+        background: #fff8f3;
+    }
+    .co-summary-letter__title {
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 6px;
+        color: #C86B4A;
+    }
+    .co-summary-letter__title i { margin-right: 6px; }
+    .co-summary-letter__to {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .co-summary-letter__msg {
+        font-size: 13px;
+        white-space: pre-line;
+        margin: 0;
+        color: #555;
+    }
+</style>
+@endpush
+
 @section('frontend_content')
     <!---------------------- checkout page content ---------------------->
 
@@ -150,6 +182,19 @@
                                             {{ number_format($item['price'] * $item['qty'], 2) }}</div>
                                     </div>
                                 @endforeach
+
+                                {{-- Gift-box letter/message from the "Cards" step, if the customer wrote one --}}
+                                @if (!empty($giftBoxLetter) && (!empty($giftBoxLetter['recipient_name']) || !empty($giftBoxLetter['message'])))
+                                    <div class="co-summary-letter">
+                                        <div class="co-summary-letter__title"><i class="fa-solid fa-envelope"></i> Gift Message</div>
+                                        @if (!empty($giftBoxLetter['recipient_name']))
+                                            <div class="co-summary-letter__to">To: {{ $giftBoxLetter['recipient_name'] }}</div>
+                                        @endif
+                                        @if (!empty($giftBoxLetter['message']))
+                                            <p class="co-summary-letter__msg">{{ $giftBoxLetter['message'] }}</p>
+                                        @endif
+                                    </div>
+                                @endif
 
                                 <div class="co-totals">
                                     <div class="co-totals-row">
